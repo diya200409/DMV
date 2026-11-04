@@ -1,0 +1,280 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+
+
+
+DATA_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 7\Stock_Prices.csv"
+
+df = pd.read_csv(DATA_PATH)
+
+df.head()
+
+
+
+
+
+print("Dataset Shape:", df.shape)
+
+print("\nColumn Names:")
+print(df.columns.tolist())
+
+print("\nDataset Information:")
+df.info()
+
+
+
+
+
+
+
+print("Missing Values:")
+print(df.isnull().sum())
+
+print("\nDuplicate Rows:", df.duplicated().sum())
+
+
+
+
+
+
+
+
+print(df.columns.tolist())
+
+
+
+
+
+
+print(df.index)
+print(df.head())
+
+
+
+
+
+
+
+
+df = df.iloc[2:].copy()
+df = df.rename(columns={"Price": "Date"})
+
+df["Date"] = pd.to_datetime(df["Date"])
+df = df.sort_values("Date").reset_index(drop=True)
+
+for col in ["Close", "High", "Low", "Open", "Volume"]:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+
+df = df.dropna()
+
+print(df.head())
+print("\nDataset Shape:", df.shape)
+print("\nDate Range:", df["Date"].min(), "to", df["Date"].max())
+
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(12, 5))
+plt.plot(df["Date"], df["Close"], label="Closing Price")
+plt.title("BEL Stock Closing Price Over Time")
+plt.xlabel("Date")
+plt.ylabel("Stock Price")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+df["MA_30"] = df["Close"].rolling(window=30).mean()
+
+plt.figure(figsize=(12, 5))
+plt.plot(df["Date"], df["Close"], label="Closing Price")
+plt.plot(df["Date"], df["MA_30"], label="30-Day Moving Average")
+plt.title("Stock Price with 30-Day Moving Average")
+plt.xlabel("Date")
+plt.ylabel("Stock Price")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+df["Month"] = df["Date"].dt.month
+df["Year"] = df["Date"].dt.year
+
+monthly_sales = df.groupby("Month")["Close"].mean()
+
+plt.figure(figsize=(10, 5))
+plt.plot(monthly_sales.index, monthly_sales.values, marker="o")
+plt.title("Average Monthly Stock Price")
+plt.xlabel("Month")
+plt.ylabel("Average Closing Price")
+plt.xticks(range(1, 13))
+plt.grid(True)
+plt.show()
+
+
+
+
+
+
+
+
+
+
+yearly_sales = df.groupby("Year")["Close"].mean()
+
+plt.figure(figsize=(12, 5))
+plt.bar(yearly_sales.index, yearly_sales.values)
+plt.title("Yearly Average Stock Price")
+plt.xlabel("Year")
+plt.ylabel("Average Closing Price")
+plt.xticks(rotation=45)
+plt.grid(axis="y")
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(12, 5))
+plt.plot(df["Date"], df["Volume"])
+plt.title("Stock Trading Volume Over Time")
+plt.xlabel("Date")
+plt.ylabel("Trading Volume")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+correlation = df[["Close", "Volume"]].corr()
+
+print("Correlation Matrix:")
+print(correlation)
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(correlation, annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Correlation Between Stock Price and Volume")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+
+stock_data = df.set_index("Date")["Close"]
+
+model = ExponentialSmoothing(stock_data, trend="add", seasonal=None)
+model_fit = model.fit()
+
+forecast = model_fit.forecast(30)
+
+plt.figure(figsize=(12, 5))
+plt.plot(stock_data.tail(100), label="Historical Closing Price")
+plt.plot(forecast, label="Forecasted Price", color="red")
+plt.title("BEL Stock Price Forecast for Next 30 Trading Days")
+plt.xlabel("Date")
+plt.ylabel("Stock Price")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+print("Forecasted Stock Prices:")
+print(forecast)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+print("Stock Market Analysis Summary")
+print("Total Records:", len(df))
+print("Date Range:", df["Date"].min(), "to", df["Date"].max())
+print("Average Closing Price:", df["Close"].mean())
+print("Highest Closing Price:", df["Close"].max())
+print("Lowest Closing Price:", df["Close"].min())
+print("Average Trading Volume:", df["Volume"].mean())
+
+
+
+
+
+
+
+
+
+
+
+
+OUTPUT_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 7\Cleaned_stock_market_analysis.csv"
+
+df.to_csv(OUTPUT_PATH, index=False)
+
+print("Stock market analysis dataset saved successfully!")
+
+
+
+
+
+
+
+
+

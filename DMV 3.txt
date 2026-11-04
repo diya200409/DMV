@@ -1,0 +1,207 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+DATA_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 3\WA_Fn-UseC_-Telco-Customer-Churn.csv"
+
+df = pd.read_csv(DATA_PATH)
+
+print("Dataset loaded successfully!")
+df.head()
+
+
+
+
+
+
+
+print("Dataset Shape:", df.shape)
+print("\nColumn Names:")
+print(df.columns.tolist())
+print("\nDataset Information:")
+df.info()
+
+
+
+
+
+
+print("Missing Values:")
+print(df.isnull().sum())
+
+
+
+
+
+
+
+print("Duplicate Rows:", df.duplicated().sum())
+
+df = df.drop_duplicates()
+
+print("Dataset Shape After Removing Duplicates:", df.shape)
+
+
+
+
+
+
+
+
+for column in df.select_dtypes(include="object").columns:
+    print("\n", column)
+    print(df[column].unique()[:10])
+
+
+
+
+
+
+
+
+
+
+df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+
+median_value = df["TotalCharges"].median()
+df["TotalCharges"] = df["TotalCharges"].fillna(median_value)
+
+print("TotalCharges converted and missing values handled!")
+print("Missing TotalCharges:", df["TotalCharges"].isnull().sum())
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(8, 5))
+sns.boxplot(x=df["MonthlyCharges"])
+plt.title("Box Plot of Monthly Charges")
+plt.xlabel("Monthly Charges")
+plt.show()
+
+
+
+
+
+
+
+
+Q1 = df["MonthlyCharges"].quantile(0.25)
+Q3 = df["MonthlyCharges"].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+df = df[(df["MonthlyCharges"] >= lower_limit) & (df["MonthlyCharges"] <= upper_limit)]
+
+print("Outliers removed successfully!")
+print("Updated Dataset Shape:", df.shape)
+
+
+
+
+
+
+
+
+
+df["AverageMonthlyCharges"] = df["MonthlyCharges"]
+
+print("New Feature Created!")
+df[["MonthlyCharges", "AverageMonthlyCharges"]].head()
+
+
+
+
+
+
+
+
+
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+
+for column in df.select_dtypes(include="object").columns:
+    df[column] = le.fit_transform(df[column].astype(str))
+
+print("Categorical Encoding Completed!")
+df.head()
+
+
+
+
+
+
+
+
+print("Missing Values:")
+print(df.isnull().sum().sum())
+
+print("\nFinal Dataset Shape:", df.shape)
+
+print("\nData Types:")
+print(df.dtypes)
+
+
+
+
+
+
+
+
+
+df.to_csv("cleaned_telecom_churn.csv", index=False)
+
+print("Cleaned Telecom Churn Dataset Saved Successfully!")
+
+
+
+
+
+
+
+
+cleaned_df = pd.read_csv("cleaned_telecom_churn.csv")
+
+print("Saved Dataset Shape:", cleaned_df.shape)
+print("Dataset Loaded Successfully!")
+cleaned_df.head()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,222 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+
+
+DATA_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 6\Retail_Sales_Data.csv"
+
+df = pd.read_csv(DATA_PATH)
+
+df.head()
+
+
+
+
+
+
+
+
+
+
+print("Dataset Shape:", df.shape)
+
+print("\nColumn Names:")
+print(df.columns.tolist())
+
+print("\nDataset Information:")
+df.info()
+
+
+
+
+
+
+
+
+print("Missing Values:")
+print(df.isnull().sum())
+
+print("\nDuplicate Rows:", df.duplicated().sum())
+
+
+
+
+
+
+
+
+region_sales = df.groupby("Region")["SalesAmount"].sum().reset_index()
+
+print("Total Sales by Region:")
+print(region_sales)
+
+
+
+
+
+category_sales = df.groupby("ProductCategory")["SalesAmount"].sum().reset_index()
+
+print("Total Sales by Product Category:")
+print(category_sales)
+
+
+
+
+
+
+
+average_sales = df.groupby("Region")["SalesAmount"].mean().reset_index()
+
+print("Average Sales by Region:")
+print(average_sales)
+
+
+
+
+
+
+
+
+category_quantity = df.groupby("ProductCategory")["QuantitySold"].sum().reset_index()
+
+print("Total Quantity Sold by Product Category:")
+print(category_quantity)
+
+
+
+
+
+
+
+
+
+
+top_region = region_sales.loc[region_sales["SalesAmount"].idxmax()]
+
+print("Top Performing Region:")
+print(top_region)
+
+
+
+
+
+
+
+
+plt.figure(figsize=(8, 5))
+plt.bar(region_sales["Region"], region_sales["SalesAmount"])
+plt.title("Total Sales by Region")
+plt.xlabel("Region")
+plt.ylabel("Total Sales")
+plt.show()
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(8, 5))
+plt.bar(category_sales["ProductCategory"], category_sales["SalesAmount"])
+plt.title("Total Sales by Product Category")
+plt.xlabel("Product Category")
+plt.ylabel("Total Sales")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(7, 7))
+plt.pie(region_sales["SalesAmount"], labels=region_sales["Region"], autopct="%1.1f%%", startangle=90)
+plt.title("Sales Distribution by Region")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(7, 7))
+plt.pie(category_sales["SalesAmount"], labels=category_sales["ProductCategory"], autopct="%1.1f%%", startangle=90)
+plt.title("Sales Distribution by Product Category")
+plt.show()
+
+
+
+
+
+
+
+
+
+print("Total Sales:", df["SalesAmount"].sum())
+print("Average Sales:", df["SalesAmount"].mean())
+print("Maximum Sales:", df["SalesAmount"].max())
+print("Minimum Sales:", df["SalesAmount"].min())
+print("Total Quantity Sold:", df["QuantitySold"].sum())
+
+
+
+
+
+
+
+
+
+
+OUTPUT_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 6"
+
+region_sales.to_csv(OUTPUT_PATH + r"\region_sales.csv", index=False)
+category_sales.to_csv(OUTPUT_PATH + r"\category_sales.csv", index=False)
+average_sales.to_csv(OUTPUT_PATH + r"\average_sales.csv", index=False)
+category_quantity.to_csv(OUTPUT_PATH + r"\category_quantity.csv", index=False)
+
+print("All aggregated reports saved successfully!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

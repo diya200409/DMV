@@ -1,0 +1,218 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+
+DATA_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 4\RealEstate_Prices.csv"
+df = pd.read_csv(DATA_PATH)
+df.head()
+
+
+
+
+
+
+print("Dataset Shape:", df.shape)
+print("\nColumn Names:")
+print(df.columns.tolist())
+print("\nDataset Information:")
+df.info()
+
+
+
+
+
+
+print("Missing Values:")
+print(df.isnull().sum())
+
+print("\nDuplicate Rows:", df.duplicated().sum())
+
+
+
+
+
+
+
+
+df = df.drop_duplicates()
+df = df.dropna()
+
+print("Dataset Shape After Cleaning:", df.shape)
+print("Missing Values After Cleaning:")
+print(df.isnull().sum().sum())
+
+
+
+
+
+
+
+df.describe()
+
+
+
+
+
+
+
+df.columns = df.columns.str.strip().str.lower().str.replace(" ", "_")
+print(df.columns.tolist())
+
+
+
+
+
+
+
+
+
+
+numeric_columns = df.select_dtypes(include=np.number).columns
+categorical_columns = df.select_dtypes(include="object").columns
+
+print("Numerical Columns:")
+print(numeric_columns.tolist())
+
+print("\nCategorical Columns:")
+print(categorical_columns.tolist())
+
+
+
+
+
+
+
+
+
+
+
+from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+
+for col in categorical_columns:
+    df[col] = le.fit_transform(df[col].astype(str))
+
+print(df.head())
+print("\nData Types After Encoding:")
+print(df.dtypes)
+
+
+
+
+
+
+
+
+
+
+
+
+
+correlation = df.corr()
+
+print(correlation)
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.corr(), annot=True, cmap="coolwarm", fmt=".2f")
+plt.title("Correlation Heatmap of Real Estate Data")
+plt.show()
+
+
+
+
+
+
+
+price_column = [col for col in df.columns if "price" in col.lower()][0]
+
+plt.figure(figsize=(8, 5))
+sns.histplot(df[price_column], kde=True)
+plt.title("Distribution of Real Estate Prices")
+plt.xlabel("Price")
+plt.ylabel("Frequency")
+plt.show()
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(8, 5))
+sns.boxplot(x=df[price_column])
+plt.title("Outlier Detection in Real Estate Prices")
+plt.xlabel("Price")
+plt.show()
+
+
+
+
+
+
+
+
+
+Q1 = df[price_column].quantile(0.25)
+Q3 = df[price_column].quantile(0.75)
+IQR = Q3 - Q1
+
+lower_limit = Q1 - 1.5 * IQR
+upper_limit = Q3 + 1.5 * IQR
+
+df = df[(df[price_column] >= lower_limit) & (df[price_column] <= upper_limit)]
+
+print("Dataset Shape After Outlier Removal:", df.shape)
+
+
+
+
+
+
+
+print("Final Dataset Shape:", df.shape)
+print("\nFinal Statistical Summary:")
+print(df.describe())
+
+
+
+
+
+
+
+
+
+
+
+OUTPUT_PATH = r"C:\Users\Akshay\OneDrive\Desktop\DMV & ML Practical\DMV Practical\DMV 4\cleaned_real_estate_data.csv"
+
+df.to_csv(OUTPUT_PATH, index=False)
+
+print("Cleaned dataset saved successfully!")
+
+
+
+
+
+
+
+
+
+
+

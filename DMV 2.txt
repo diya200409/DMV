@@ -1,0 +1,207 @@
+import requests
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+
+
+
+
+API_KEY = input("Enter your OpenWeatherMap API Key: ")
+city = "Pune"
+
+print("API Key entered successfully!")
+
+
+
+
+
+
+
+url = "https://api.openweathermap.org/data/2.5/weather"
+
+params = {
+    "q": city,
+    "appid": API_KEY,
+    "units": "metric"
+}
+
+response = requests.get(url, params=params)
+
+print("Status Code:", response.status_code)
+
+if response.status_code == 200:
+    weather_data = response.json()
+    print("Weather data retrieved successfully!")
+else:
+    print(response.json())
+
+
+
+
+
+
+
+
+temperature = weather_data["main"]["temp"]
+humidity = weather_data["main"]["humidity"]
+pressure = weather_data["main"]["pressure"]
+wind_speed = weather_data["wind"]["speed"]
+weather_description = weather_data["weather"][0]["description"]
+
+print("City:", city)
+print("Temperature:", temperature, "°C")
+print("Humidity:", humidity, "%")
+print("Pressure:", pressure, "hPa")
+print("Wind Speed:", wind_speed, "m/s")
+print("Weather:", weather_description)
+
+
+
+
+
+
+
+
+weather_df = pd.DataFrame({
+    "City": [city],
+    "Temperature": [temperature],
+    "Humidity": [humidity],
+    "Pressure": [pressure],
+    "Wind_Speed": [wind_speed],
+    "Weather": [weather_description]
+})
+
+weather_df
+
+
+
+
+
+
+
+
+
+
+print("Weather Statistics:")
+print(weather_df[["Temperature", "Humidity", "Pressure", "Wind_Speed"]].describe())
+
+
+
+
+
+
+
+
+weather_values = weather_df[["Temperature", "Humidity", "Pressure", "Wind_Speed"]].iloc[0]
+
+weather_values.plot(kind="bar", figsize=(8, 5))
+plt.title("Weather Parameters in Pune")
+plt.xlabel("Weather Parameters")
+plt.ylabel("Values")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+plt.figure(figsize=(6, 4))
+plt.bar(weather_df["City"], weather_df["Temperature"])
+plt.title("Temperature by City")
+plt.xlabel("City")
+plt.ylabel("Temperature (°C)")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(6, 4))
+plt.bar(weather_df["City"], weather_df["Humidity"])
+plt.title("Humidity by City")
+plt.xlabel("City")
+plt.ylabel("Humidity (%)")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(6, 4))
+plt.bar(weather_df["City"], weather_df["Pressure"])
+plt.title("Atmospheric Pressure by City")
+plt.xlabel("City")
+plt.ylabel("Pressure (hPa)")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+plt.figure(figsize=(6, 4))
+plt.bar(weather_df["City"], weather_df["Wind_Speed"])
+plt.title("Wind Speed by City")
+plt.xlabel("City")
+plt.ylabel("Wind Speed (m/s)")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+weather_df.to_csv("weather_data.csv", index=False)
+
+print("Weather data saved successfully!")
+
+
+
+
+
+
+
+saved_weather = pd.read_csv("weather_data.csv")
+
+print("Dataset Shape:", saved_weather.shape)
+saved_weather.head()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
